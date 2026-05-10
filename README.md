@@ -51,16 +51,21 @@ Then open `http://localhost:8080`.
 ## Install As A Service
 
 The repo includes a systemd service file at `systemd/senseibox-kpi.service`.
-It expects the app to live at `/opt/senseibox-kpi`, run as the `senseibox`
-service user, and listen on port `8001`.
+It expects the app to live at `/opt/senseibox/senseibox-kpi`, run as the
+`senseibox` service user, and listen on port `8001`.
 
-On a fresh Linux VM:
+On a fresh Linux system, create the service user and install the app under the
+Senseibox namespace:
 
 ```bash
-cd /opt/senseibox-kpi
-python3 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -e .
+sudo useradd --system --home /opt/senseibox --shell /usr/sbin/nologin senseibox
+sudo mkdir -p /opt/senseibox/senseibox-kpi
+sudo chown -R senseibox:senseibox /opt/senseibox
+
+cd /opt/senseibox/senseibox-kpi
+sudo -u senseibox python3 -m venv .venv
+sudo -u senseibox .venv/bin/python -m pip install --upgrade pip
+sudo -u senseibox .venv/bin/python -m pip install -e .
 ```
 
 Then install and start the service:
