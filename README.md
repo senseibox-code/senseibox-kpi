@@ -50,31 +50,15 @@ Then open `http://localhost:8080`.
 
 ## Install As A Service
 
-The repo includes a systemd service file at `systemd/senseibox-kpi.service`.
-It expects the app to live at `/opt/senseibox/senseibox-kpi`, run as the
-`senseibox` service user, and listen on port `8001`.
-
-On a fresh Linux system, create the service user and install the app under the
-Senseibox namespace:
+After checking out the repo on a Linux system, run:
 
 ```bash
-sudo useradd --system --home /opt/senseibox --shell /usr/sbin/nologin senseibox
-sudo mkdir -p /opt/senseibox/senseibox-kpi
-sudo chown -R senseibox:senseibox /opt/senseibox
-
-cd /opt/senseibox/senseibox-kpi
-sudo -u senseibox python3 -m venv .venv
-sudo -u senseibox .venv/bin/python -m pip install --upgrade pip
-sudo -u senseibox .venv/bin/python -m pip install -e .
+sudo ./install.sh
 ```
 
-Then install and start the service:
-
-```bash
-sudo cp systemd/senseibox-kpi.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now senseibox-kpi
-```
+The installer copies the app into `/opt/senseibox/senseibox-kpi`, creates the
+`senseibox` service user when needed, builds the virtualenv, installs the
+systemd service, and starts it on port `8001`.
 
 Check it:
 
@@ -86,8 +70,7 @@ curl http://127.0.0.1:8001/api/snapshot
 
 Open `http://<server-ip>:8001/`.
 
-If you install to a different path, user, or port, update
-`systemd/senseibox-kpi.service` before copying it into `/etc/systemd/system/`.
+The tracked service file lives at `systemd/senseibox-kpi.service`.
 
 ## Notes
 
