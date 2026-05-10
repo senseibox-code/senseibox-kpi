@@ -24,7 +24,7 @@ if ! command -v rsync >/dev/null 2>&1; then
   exit 1
 fi
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 echo "Installing ${APP_NAME} into ${INSTALL_DIR}"
 
@@ -41,14 +41,19 @@ install -d -o "${SERVICE_USER}" -g "${SERVICE_GROUP}" "${INSTALL_DIR}"
 
 systemctl stop "${SERVICE_NAME}" >/dev/null 2>&1 || true
 
-rsync -a --delete \
-  --exclude ".git" \
-  --exclude ".venv" \
-  --exclude "__pycache__" \
-  --exclude "*.pyc" \
-  --exclude ".pytest_cache" \
-  --exclude ".DS_Store" \
-  "${SCRIPT_DIR}/" "${INSTALL_DIR}/"
+TARGET_DIR="$(cd -- "${INSTALL_DIR}" && pwd -P)"
+if [ "${SCRIPT_DIR}" = "${TARGET_DIR}" ]; then
+  echo "Source is already ${INSTALL_DIR}; skipping file copy."
+else
+  rsync -a --delete \
+    --exclude ".git" \
+    --exclude ".venv" \
+    --exclude "__pycache__" \
+    --exclude "*.pyc" \
+    --exclude ".pytest_cache" \
+    --exclude ".DS_Store" \
+    "${SCRIPT_DIR}/" "${INSTALL_DIR}/"
+fi
 
 chown -R "${SERVICE_USER}:${SERVICE_GROUP}" "${INSTALL_ROOT}"
 
