@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import json
 from contextlib import asynccontextmanager
+from importlib import metadata
 from pathlib import Path
 
 import uvicorn
@@ -18,6 +19,18 @@ from .metrics import MetricsSampler, ProcessSampler, file_usage, filesystems
 
 ROOT = Path(__file__).resolve().parents[2]
 STATIC = ROOT / "static"
+VERSION_FILE = ROOT / "VERSION"
+
+
+def app_version() -> str:
+    try:
+        version = VERSION_FILE.read_text(encoding="utf-8").strip()
+    except OSError:
+        try:
+            return metadata.version("system-dashboard")
+        except metadata.PackageNotFoundError:
+            return "0.0.0"
+    return version or "0.0.0"
 
 
 class MetricsHub:
@@ -78,6 +91,10 @@ async def api_snapshot(_request):
     return JSONResponse(hub.current)
 
 
+async def api_version(_request):
+    return JSONResponse({"version": app_version()})
+
+
 async def api_processes(_request):
     return JSONResponse(process_sampler.sample())
 
@@ -117,6 +134,7 @@ def create_app() -> Starlette:
             Route("/api/uptime", api_uptime),
             Route("/api/info", api_info),
             Route("/api/snapshot", api_snapshot),
+            Route("/api/version", api_version),
             Route("/api/processes", api_processes),
             Route("/api/storage/filesystems", api_storage_filesystems),
             Route("/api/storage/files", api_storage_files),

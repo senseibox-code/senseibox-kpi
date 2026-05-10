@@ -19,6 +19,7 @@ GET /api/usage
 GET /api/uptime
 GET /api/info
 GET /api/snapshot
+GET /api/version
 GET /api/processes
 GET /api/storage/filesystems
 GET /api/storage/files
@@ -35,6 +36,12 @@ Example `/api/uptime`:
 
 ```json
 {"days":"00","hours":"00","minutes":"31","seconds":"23"}
+```
+
+Example `/api/version`:
+
+```json
+{"version":"0.1.0"}
 ```
 
 ## Run Locally

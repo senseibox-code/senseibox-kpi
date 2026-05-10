@@ -70,6 +70,7 @@ def test_api_routes_return_current_hub_snapshot(monkeypatch):
         assert client.get("/api/uptime").json() == SNAPSHOT["uptime"]
         assert client.get("/api/info").json() == SNAPSHOT["info"]
         assert client.get("/api/snapshot").json() == SNAPSHOT
+        assert client.get("/api/version").json() == {"version": app_module.app_version()}
         assert client.get("/api/processes").json() == {
             "processes": [
                 {
