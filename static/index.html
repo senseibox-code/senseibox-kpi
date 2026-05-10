@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Senseibox</title>
+    <link rel="stylesheet" href="/static/styles.css?v=20260510-4">
+  </head>
+  <body>
+    <main class="dashboard" aria-label="System dashboard">
+      <header class="dashboard-header">
+        <a class="brand" href="/" aria-label="Senseibox dashboard">
+          <img src="/static/assets/logo_dark.png" alt="Senseibox">
+        </a>
+        <div class="view-tabs" role="tablist" aria-label="Dashboard views">
+          <button class="view-tab is-active" type="button" data-view="performance" role="tab" aria-selected="true">
+            Performance
+          </button>
+          <button class="view-tab" type="button" data-view="processes" role="tab" aria-selected="false">
+            Processes
+          </button>
+          <button class="view-tab" type="button" data-view="storage" role="tab" aria-selected="false">
+            Storage
+          </button>
+          <span id="stream-state" class="sr-only">Connecting</span>
+        </div>
+      </header>
+
+      <section class="chart-grid performance-section">
+        <article class="chart-card">
+          <header class="chart-header">
+            <div>
+              <h2>Hardware Utilization (%)</h2>
+              <p>Rolling sample window</p>
+            </div>
+            <div class="legend" aria-label="Chart legend">
+              <span class="legend-item cpu">CPU</span>
+              <span class="legend-item ram">RAM</span>
+              <span class="legend-item storage">Storage</span>
+            </div>
+          </header>
+          <canvas id="usage-chart" width="1120" height="300" aria-label="Hardware utilization chart"></canvas>
+        </article>
+      </section>
+
+      <section class="metrics-grid performance-section" aria-label="Current usage">
+        <article class="metric-card accent-cpu">
+          <header class="metric-header">
+            <div class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <path d="M20 20h24v24H20z"/>
+                <path d="M27 27h10v10H27z"/>
+                <path d="M14 28h6m-6 8h6m24-8h6m-6 8h6M28 14v6m8-6v6m-8 24v6m8-6v6"/>
+                <path d="M11 20v-6h6m30 0h6v6M17 50h-6v-6m42 0v6h-6"/>
+              </svg>
+            </div>
+            <div>
+              <h2>Processor</h2>
+              <p id="processor-name">Loading</p>
+            </div>
+          </header>
+          <div class="metric-main">
+            <div>
+              <div class="metric-value"><span id="processor-usage">0</span>%</div>
+              <div class="meter-label">Processor Usage</div>
+            </div>
+            <canvas id="processor-spark" class="sparkline" width="180" height="74" aria-hidden="true"></canvas>
+          </div>
+          <div class="meter"><span id="processor-bar"></span></div>
+          <footer class="metric-footer">
+            <span id="processor-cores">-- Cores</span>
+            <span id="processor-clock">-- GHz</span>
+            <span id="processor-bit-depth">-- bit</span>
+          </footer>
+        </article>
+
+        <article class="metric-card accent-ram">
+          <header class="metric-header">
+            <div class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <path d="M15 24h34v16H15z"/>
+                <path d="M21 40v7m7-7v7m8-7v7m7-7v7M21 17v7m7-7v7m8-7v7m7-7v7"/>
+                <path d="M22 32h5l3-5 5 10 3-5h4"/>
+                <path d="M12 29h3m34 0h3m-40 6h3m34 0h3"/>
+              </svg>
+            </div>
+            <div>
+              <h2>Memory</h2>
+              <p id="machine-os">Loading</p>
+            </div>
+          </header>
+          <div class="metric-main">
+            <div>
+              <div class="metric-value"><span id="ram-usage">0</span>%</div>
+              <div class="meter-label">Memory Usage</div>
+            </div>
+            <canvas id="ram-spark" class="sparkline" width="180" height="74" aria-hidden="true"></canvas>
+          </div>
+          <div class="meter"><span id="ram-bar"></span></div>
+          <footer class="metric-footer">
+            <span id="total-ram">-- RAM</span>
+            <span id="machine-bit-depth">-- bit</span>
+            <span id="proc-count">-- Procs</span>
+          </footer>
+        </article>
+
+        <article class="metric-card accent-storage">
+          <header class="metric-header">
+            <div class="icon-badge" aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <path d="M18 20c0-4 6.3-7 14-7s14 3 14 7-6.3 7-14 7-14-3-14-7z"/>
+                <path d="M18 20v12c0 4 6.3 7 14 7s14-3 14-7V20"/>
+                <path d="M18 32v12c0 4 6.3 7 14 7s14-3 14-7V32"/>
+                <path d="M38 43h3m-23-9c2.5 2.4 7.5 4 14 4"/>
+              </svg>
+            </div>
+            <div>
+              <h2>Storage</h2>
+              <p id="main-storage">Loading</p>
+            </div>
+          </header>
+          <div class="metric-main">
+            <div>
+              <div class="metric-value"><span id="storage-usage">0</span>%</div>
+              <div class="meter-label">Storage Usage</div>
+            </div>
+            <canvas id="storage-spark" class="sparkline" width="180" height="74" aria-hidden="true"></canvas>
+          </div>
+          <div class="meter"><span id="storage-bar"></span></div>
+          <footer class="metric-footer">
+            <span id="storage-total">-- Total</span>
+            <span id="disk-count">-- Disks</span>
+            <span id="swap-amount">-- Swap</span>
+          </footer>
+        </article>
+
+        <article class="uptime-card">
+          <header>
+            <h2>Uptime</h2>
+            <p>Since Last Reboot</p>
+          </header>
+          <div class="uptime-blocks">
+            <div><strong id="days">00</strong><span>Days</span></div>
+            <div><strong id="hours">00</strong><span>Hours</span></div>
+            <div><strong id="minutes">00</strong><span>Minutes</span></div>
+            <div><strong id="seconds">00</strong><span>Seconds</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="processes-section" hidden>
+        <article class="processes-card">
+          <header class="processes-header">
+            <div>
+              <h2>Processes</h2>
+              <p>Updated in real time. Sorted by CPU usage.</p>
+            </div>
+            <label class="process-filter">
+              <span class="sr-only">Filter processes</span>
+              <input id="process-filter" type="search" placeholder="Filter...">
+            </label>
+          </header>
+
+          <div class="process-table-wrap">
+            <table class="process-table">
+              <thead>
+                <tr>
+                  <th scope="col">Process Name</th>
+                  <th scope="col">% CPU</th>
+                  <th scope="col">CPU Time</th>
+                  <th scope="col">Threads</th>
+                  <th scope="col">PID</th>
+                  <th scope="col">User</th>
+                </tr>
+              </thead>
+              <tbody id="process-rows">
+                <tr>
+                  <td colspan="6" class="process-empty">Loading processes...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="storage-section" hidden>
+        <article class="processes-card storage-panel">
+          <header class="processes-header">
+            <div>
+              <h2>Filesystem</h2>
+              <p>Manual snapshot of mounted filesystems.</p>
+            </div>
+            <button id="refresh-filesystems" class="refresh-button" type="button">
+              Refresh
+            </button>
+          </header>
+
+          <div class="process-table-wrap">
+            <table class="process-table storage-table">
+              <thead>
+                <tr>
+                  <th scope="col">Filesystem</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Used</th>
+                  <th scope="col">Avail</th>
+                  <th scope="col">Use%</th>
+                  <th scope="col">Mounted on</th>
+                </tr>
+              </thead>
+              <tbody id="filesystem-rows">
+                <tr>
+                  <td colspan="6" class="process-empty">Press refresh to load filesystems.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="processes-card storage-panel">
+          <header class="processes-header">
+            <div>
+              <h2>Files</h2>
+              <p>Largest paths on the root filesystem. This can take a while.</p>
+            </div>
+            <button id="refresh-files" class="refresh-button" type="button">
+              Refresh
+            </button>
+          </header>
+
+          <div class="process-table-wrap">
+            <table class="process-table storage-table">
+              <thead>
+                <tr>
+                  <th scope="col">Path</th>
+                  <th scope="col">Size</th>
+                </tr>
+              </thead>
+              <tbody id="file-rows">
+                <tr>
+                  <td colspan="2" class="process-empty">Press refresh to scan files.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p id="file-scan-note" class="scan-note" hidden></p>
+        </article>
+      </section>
+
+      <footer class="app-footer">
+        <div class="footer-icons">
+          <a href="https://github.com/senseibox-code" class="footer-link" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" class="footer-icon" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.49v-1.72c-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.97c.85 0 1.7.12 2.5.34 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.95.68 1.92v2.76c0 .27.18.59.69.49A10.25 10.25 0 0 0 22 12.24C22 6.58 17.52 2 12 2Z" />
+            </svg>
+            <span>GitHub</span>
+          </a>
+
+          <a href="https://discord.com/channels/1502691596515283147/1502691670896939018" class="footer-link" aria-label="Discord">
+            <svg viewBox="0 0 24 24" class="footer-icon" aria-hidden="true">
+              <path d="M20.32 4.37A18.6 18.6 0 0 0 15.7 3a12.8 12.8 0 0 0-.59 1.2 17.4 17.4 0 0 0-5.22 0A12.8 12.8 0 0 0 9.3 3a18.6 18.6 0 0 0-4.62 1.37C1.76 8.82.96 13.16 1.36 17.44A18.8 18.8 0 0 0 7 20.36a14.2 14.2 0 0 0 1.21-2 12.3 12.3 0 0 1-1.91-.94c.16-.12.32-.25.47-.38a13.2 13.2 0 0 0 10.46 0c.15.13.31.26.47.38a12.3 12.3 0 0 1-1.91.94 14.2 14.2 0 0 0 1.21 2 18.8 18.8 0 0 0 5.64-2.92c.47-4.96-.8-9.25-2.32-13.07ZM8.68 14.82c-1.1 0-2-1.04-2-2.32s.88-2.32 2-2.32c1.12 0 2.02 1.05 2 2.32 0 1.28-.88 2.32-2 2.32Zm6.64 0c-1.1 0-2-1.04-2-2.32s.88-2.32 2-2.32c1.12 0 2.02 1.05 2 2.32 0 1.28-.88 2.32-2 2.32Z" />
+            </svg>
+            <span>Discord</span>
+          </a>
+
+          <a href="https://twitter.com/" class="footer-link" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" class="footer-icon" aria-hidden="true">
+              <path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64Z" />
+            </svg>
+            <span>Twitter</span>
+          </a>
+
+          <a href="/docs" class="footer-link" aria-label="Docs">
+            <svg viewBox="0 0 24 24" class="footer-icon" aria-hidden="true">
+              <path d="M6 2.75A2.75 2.75 0 0 0 3.25 5.5v13A2.75 2.75 0 0 0 6 21.25h12A2.75 2.75 0 0 0 20.75 18.5V8.1a2.75 2.75 0 0 0-.8-1.95l-2.1-2.1a2.75 2.75 0 0 0-1.95-.8H6Zm0 1.5h9.5v3.5c0 .41.34.75.75.75h3v10A1.25 1.25 0 0 1 18 19.75H6a1.25 1.25 0 0 1-1.25-1.25v-13A1.25 1.25 0 0 1 6 4.25Zm11 1.06 1.94 1.94H17V5.31ZM7.5 10.25h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Zm0 3h9a.75.75 0 0 1 0 1.5h-9a.75.75 0 0 1 0-1.5Zm0 3h5a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1 0-1.5Z" />
+            </svg>
+            <span>Docs</span>
+          </a>
+        </div>
+
+        <div class="footer-meta">
+          <p class="app-version">Senseibox KPI v0.1.0</p>
+
+          <p class="footer-copy">
+            For bug reports, please visit GitHub Issues. For suggestions or improvements,
+            create a pull request on GitHub.
+          </p>
+
+          <div class="footer-rule" aria-hidden="true"></div>
+
+          <p class="footer-licence">
+            &copy; Senseibox. This software is released under the GPL licence.
+          </p>
+        </div>
+      </footer>
+
+    </main>
+    <script src="/static/dashboard.js?v=20260510-4" defer></script>
+  </body>
+</html>
