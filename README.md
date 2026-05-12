@@ -3,6 +3,8 @@
 A small Linux-only system telemetry dashboard designed for lightweight server boards.
 It exposes simple JSON APIs and streams live updates to a clean HTML/CSS/JS dashboard.
 
+![Senseibox KPI dashboard](docs/assets/senseibox-kpi.png)
+
 ## Features
 
 - CPU, memory, storage, process, swap, and uptime telemetry
