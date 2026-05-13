@@ -263,10 +263,10 @@ def test_filesystems_collapses_duplicate_backing_filesystems(monkeypatch, tmp_pa
     def fake_disk_usage(path):
         values = {
             "/": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3, free=11 * 1024**3),
-            "/boot": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3, free=11 * 1024**3),
-            "/etc": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3, free=11 * 1024**3),
+            "/boot": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3 + 64, free=11 * 1024**3 - 64),
+            "/etc": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3 + 128, free=11 * 1024**3 - 128),
             "/run": SimpleNamespace(total=197 * 1024**2, used=800 * 1024, free=196 * 1024**2),
-            "/run/credentials": SimpleNamespace(total=197 * 1024**2, used=800 * 1024, free=196 * 1024**2),
+            "/run/credentials": SimpleNamespace(total=197 * 1024**2, used=800 * 1024 + 64, free=196 * 1024**2 - 64),
         }
         return values[path]
 

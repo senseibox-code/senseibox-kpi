@@ -199,28 +199,29 @@ def system_info() -> dict[str, dict[str, str]]:
 def filesystems() -> dict[str, list[dict[str, object]]]:
     rows: list[dict[str, object]] = []
     seen_mounts: set[str] = set()
-    seen_usage: set[tuple[str, int, int, int]] = set()
+    seen_backing_filesystems: set[tuple[str, str]] = set()
     minimum_size = 1024**2
     for line in _read_text(PROC / "self" / "mountinfo").splitlines():
         parts = line.split()
         if len(parts) < 10 or "-" not in parts:
             continue
         separator = parts.index("-")
+        device_id = parts[2]
         mount_point = _decode_mount_field(parts[4])
         if mount_point in seen_mounts:
             continue
         seen_mounts.add(mount_point)
         filesystem = _decode_mount_field(parts[separator + 2])
+        backing_signature = (device_id, filesystem)
         try:
             usage = shutil.disk_usage(mount_point)
         except OSError:
             continue
         if usage.total <= minimum_size:
             continue
-        usage_signature = (filesystem, usage.total, usage.used, usage.free)
-        if usage_signature in seen_usage:
+        if backing_signature in seen_backing_filesystems:
             continue
-        seen_usage.add(usage_signature)
+        seen_backing_filesystems.add(backing_signature)
         percent = round((usage.used / usage.total) * 100) if usage.total else 0
         rows.append(
             {
