@@ -86,4 +86,4 @@ The tracked service file lives at `systemd/senseibox-kpi.service`.
 
 ## License
 
-This software is licensed under the [GPL-3.0](LICENSE).
+This software is licensed under GPL-3.0.
