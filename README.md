@@ -5,6 +5,8 @@ It exposes simple JSON APIs and streams live updates to a clean HTML/CSS/JS dash
 
 ![Senseibox KPI dashboard](docs/assets/senseibox-kpi.png)
 
+Note: This project targets Linux servers. macOS and Windows are intentionally out of scope.
+
 ## Features
 
 - CPU, memory, storage, process, swap, and uptime telemetry
@@ -81,6 +83,7 @@ Open `http://<server-ip>:8001/`.
 
 The tracked service file lives at `systemd/senseibox-kpi.service`.
 
-## Notes
 
-This project targets Linux servers. macOS and Windows are intentionally out of scope.
+## License
+
+This software is licensed under the [GPL-3.0](LICENSE).
