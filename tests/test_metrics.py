@@ -245,6 +245,55 @@ def test_filesystems_reads_mountinfo(monkeypatch, tmp_path):
     }
 
 
+def test_filesystems_collapses_duplicate_backing_filesystems(monkeypatch, tmp_path):
+    proc = set_proc(monkeypatch, tmp_path)
+    (proc / "self").mkdir()
+    (proc / "self" / "mountinfo").write_text(
+        "\n".join(
+            [
+                "22 1 254:3 / / rw,relatime - ext4 /dev/vda3 rw",
+                "23 22 254:3 /boot /boot rw,relatime - ext4 /dev/vda3 rw",
+                "24 22 254:3 /etc /etc rw,relatime - ext4 /dev/vda3 rw",
+                "25 22 0:22 / /run rw,nosuid,nodev - tmpfs tmpfs rw",
+                "26 22 0:22 /credentials /run/credentials rw,nosuid,nodev - tmpfs tmpfs rw",
+            ]
+        )
+    )
+
+    def fake_disk_usage(path):
+        values = {
+            "/": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3, free=11 * 1024**3),
+            "/boot": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3, free=11 * 1024**3),
+            "/etc": SimpleNamespace(total=18 * 1024**3, used=7 * 1024**3, free=11 * 1024**3),
+            "/run": SimpleNamespace(total=197 * 1024**2, used=800 * 1024, free=196 * 1024**2),
+            "/run/credentials": SimpleNamespace(total=197 * 1024**2, used=800 * 1024, free=196 * 1024**2),
+        }
+        return values[path]
+
+    monkeypatch.setattr(metrics.shutil, "disk_usage", fake_disk_usage)
+
+    assert metrics.filesystems() == {
+        "filesystems": [
+            {
+                "filesystem": "/dev/vda3",
+                "size": "18G",
+                "used": "7G",
+                "available": "11G",
+                "percent": 39,
+                "mountedOn": "/",
+            },
+            {
+                "filesystem": "tmpfs",
+                "size": "197M",
+                "used": "800K",
+                "available": "196M",
+                "percent": 0,
+                "mountedOn": "/run",
+            },
+        ]
+    }
+
+
 def test_file_usage_stays_on_root_filesystem(tmp_path):
     root = tmp_path / "root"
     root.mkdir()

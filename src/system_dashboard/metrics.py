@@ -199,6 +199,7 @@ def system_info() -> dict[str, dict[str, str]]:
 def filesystems() -> dict[str, list[dict[str, object]]]:
     rows: list[dict[str, object]] = []
     seen_mounts: set[str] = set()
+    seen_usage: set[tuple[str, int, int, int]] = set()
     minimum_size = 1024**2
     for line in _read_text(PROC / "self" / "mountinfo").splitlines():
         parts = line.split()
@@ -216,6 +217,10 @@ def filesystems() -> dict[str, list[dict[str, object]]]:
             continue
         if usage.total <= minimum_size:
             continue
+        usage_signature = (filesystem, usage.total, usage.used, usage.free)
+        if usage_signature in seen_usage:
+            continue
+        seen_usage.add(usage_signature)
         percent = round((usage.used / usage.total) * 100) if usage.total else 0
         rows.append(
             {
